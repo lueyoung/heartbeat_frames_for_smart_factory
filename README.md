@@ -1,6 +1,6 @@
 ## heartbeat_for_smart_factory
-### 0 Paper
-### 1 Heartbeat frame struct
+### 0. Paper
+### 1. Heartbeat frame struct
 
 <table border="1" width="500px" cellspacing="10">
 <tr>
@@ -148,3 +148,7 @@
   <td>4 Bytes</td>
 </tr>
 </table>
+
+### 2. Demo
+`./demo` includes some demos for the project.		
+
