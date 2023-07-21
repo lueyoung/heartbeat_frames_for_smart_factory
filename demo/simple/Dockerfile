@@ -6,10 +6,10 @@ RUN apt-get install -y gcc
 ADD src/recver.c /workspace/
 ADD src/sender.c /workspace/
 WORKDIR /workspace
-#RUN gcc -Wall sender.c -o send 
+RUN gcc -Wall sender.c -o send 
 RUN gcc -Wall recver.c -o recv
 
 FROM ubuntu:20.04
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 COPY --from=build /workspace/recv /
-ENTRYPOINT ["/recv"]
+COPY --from=build /workspace/send /
