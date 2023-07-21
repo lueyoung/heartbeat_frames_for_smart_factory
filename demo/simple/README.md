@@ -1,6 +1,6 @@
 ## Simple Demo
 ### 0. Prerequisites
-* Install `docker`.
+* Install `docker`;
 * Install `docker-compose`.
 ### 1. How to run?
 To run this demo, you just need to run
