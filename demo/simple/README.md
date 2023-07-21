@@ -13,7 +13,7 @@ Run
 ```
 docker logs -f recver
 ```
-to see the stdout of container `recver`;		
+to see the stdout of container `recver`;   
 run
 ```
 docker logs -f sender
