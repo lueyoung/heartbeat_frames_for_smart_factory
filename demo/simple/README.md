@@ -18,4 +18,9 @@ run
 ```
 docker logs -f sender
 ```
-to see the stdout of container `sender`.
+to see the stdout of container `sender`.  
+Or read log files:
+```
+docker exec -it recver tail -f /udp_packets.log
+docker exec -it sender tail -f /udp_packets.log
+```

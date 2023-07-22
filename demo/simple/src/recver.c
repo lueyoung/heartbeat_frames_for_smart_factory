@@ -165,6 +165,15 @@ void print_buffer(unsigned char *buf, int buf_len) {
     printf("\n");
 }
 
+void log_packet(FILE* log_file, unsigned char *buf, int buf_len){
+    fprintf(log_file, "\nRecv\n");
+    int i = 0;
+    for (i=0; i < buf_len; i++){
+        fprintf(log_file, "%.2X ", buf[i]);
+    }
+    fprintf(log_file, "\n");
+}
+
 int share_mac(){
     unsigned char mac[6] = {0};
     int sock_raw;
@@ -246,7 +255,7 @@ int main() {
 
     printf("starting .... %d\n", sock_raw);
     //while (!done) {
-    while (1) {
+    for(;;) {
         // Receive data packet
         saddr_len = sizeof saddr;
         buf_len = recvfrom(sock_raw, buffer, 65536, 0, &saddr, (socklen_t *)&saddr_len);
@@ -281,6 +290,7 @@ int main() {
         udp_payload(log_file, udp_hdr);
         // exit when the count of received udp packets is more than 10
         //if (++udp >= 10) done = 1;
+        log_packet(log_file, buffer, buf_len);
     }
 
 QUIT:

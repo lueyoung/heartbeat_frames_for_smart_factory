@@ -20,10 +20,10 @@
 
 #define GATEWAY         1
 
-#define IF_NAME         "eth0"             // name of local eth interface
-#define DEST_IP         "10.0.4.10"      // destination ip
-//#define DEST_IP         "193.233.207.175"    // destination ip
+#define IF_NAME         "eth0"			// name of local eth interface
+#define DEST_IP         "1.2.3.4"		// destination ip
 #define MAC_FILE	"/shared/mac.txt"
+#define LOG_FILE       "udp_packets.log"	// log file name
 
 
 #if GATEWAY
@@ -213,11 +213,27 @@ int read_mac(unsigned char *mac) {
     fclose(in);
     return 0;
 }
+void log_dst_mac(FILE* log_file){
+    fprintf(log_file, "\nMAC\n");
+    fprintf(log_file, "%.2X:%.2X:%.2X:%.2X:%.2X:%.2X\n",
+           dst_mac[0], dst_mac[1], dst_mac[2],
+           dst_mac[3], dst_mac[4], dst_mac[5]);
+}
+
+void log_packet(FILE* log_file, unsigned char *buf, int buf_len){
+    fprintf(log_file, "\nSend\n");
+    int i = 0;
+    for (i=0; i < buf_len; i++){
+        fprintf(log_file, "%.2X ", buf[i]);
+    }
+    fprintf(log_file, "\n");
+}
 
 /******************************************************************
  * Main
  ******************************************************************/
 int main() {
+    FILE* log_file;                 // log file
     int sock_raw;                   // raw socket
     char ip[16] = {0};              // local IP address
     unsigned char mac[6] = {0};     // local MAc address
@@ -228,7 +244,15 @@ int main() {
 
     int ret_value = EXIT_SUCCESS;   // return value
 
+    // Create a log file for storing output
+    log_file = fopen(LOG_FILE, "w");
+    if (!log_file) {
+        printf("Unable to open %s\n", LOG_FILE);
+        return -1;
+    }
+
     read_mac(dst_mac);
+    log_dst_mac(log_file);
 
     sock_raw = socket(AF_PACKET, SOCK_RAW, IPPROTO_RAW);
     if (sock_raw == -1) {
@@ -266,12 +290,12 @@ int main() {
     memset(&saddr_ll, 0, sizeof(struct sockaddr_ll));
     saddr_ll.sll_ifindex  = if_index;
     saddr_ll.sll_halen    = ETH_ALEN;
-    saddr_ll.sll_addr[0]  = //DEST_MAC_0;
-    saddr_ll.sll_addr[1]  = //DEST_MAC_1;
-    saddr_ll.sll_addr[2]  = //DEST_MAC_2;
-    saddr_ll.sll_addr[3]  = //DEST_MAC_3;
-    saddr_ll.sll_addr[4]  = //DEST_MAC_4;
-    saddr_ll.sll_addr[5]  = //DEST_MAC_5;
+    //saddr_ll.sll_addr[0]  = DEST_MAC_0;
+    //saddr_ll.sll_addr[1]  = DEST_MAC_1;
+    //saddr_ll.sll_addr[2]  = DEST_MAC_2;
+    //saddr_ll.sll_addr[3]  = DEST_MAC_3;
+    //saddr_ll.sll_addr[4]  = DEST_MAC_4;
+    //saddr_ll.sll_addr[5]  = DEST_MAC_5;
     saddr_ll.sll_addr[0]  = dst_mac[0];
     saddr_ll.sll_addr[1]  = dst_mac[1];
     saddr_ll.sll_addr[2]  = dst_mac[2];
@@ -283,6 +307,7 @@ int main() {
     //while (send_len == 0) {
     for (;;){
         send_len = sendto(sock_raw, send_buf, 64, 0, (const struct sockaddr *)&saddr_ll, sizeof(struct sockaddr_ll));
+        log_packet(log_file, send_buf, send_len);
         if (send_len < 0) {
             perror("sendto()");
             ret_value = EXIT_FAILURE;
