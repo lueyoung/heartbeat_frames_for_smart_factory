@@ -1,0 +1,29 @@
+version: "3.3"
+services:
+  recver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - shared-volume:/shared
+    hostname: recver
+    container_name: recver
+    command:
+      - /recv
+  sender:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - shared-volume:/shared
+    hostname: sender
+    container_name: sender
+    command:
+      - /send
+    depends_on:
+      - recver
+    links:
+      - recver
+
+volumes:
+    shared-volume: 
